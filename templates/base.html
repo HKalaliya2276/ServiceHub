@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>ServiceHub</title>
+</head>
+<body>
+
+{% if user.is_authenticated %}
+    <p>Welcome, {{ user.username }} ({{ user.role }})</p>
+    <a href="/logout/">Logout</a>
+{% else %}
+    <a href="/login/">Login</a>
+    <a href="/register/">Register</a>
+{% endif %}
+
+<hr>
+
+{% block content %}{% endblock %}
+
+</body>
+</html>
