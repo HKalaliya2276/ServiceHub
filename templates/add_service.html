@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h2>Add Service</h2>
+
+<form method="POST">
+    {% csrf_token %}
+    <input type="text" name="title" placeholder="Service Title"><br><br>
+    <textarea name="description" placeholder="Description"></textarea><br><br>
+    <input type="number" name="price" placeholder="Price"><br><br>
+
+    <button type="submit">Add Service</button>
+</form>
+
+{% endblock %}
