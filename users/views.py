@@ -1,4 +1,5 @@
 from django.shortcuts import render, redirect
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, login
 from .forms import UserRegisterForm
 from django.contrib.auth import logout
@@ -24,10 +25,41 @@ def login_view(request):
 
         if user is not None:
             login(request, user)
-            return redirect('login') 
+            return redirect('dashboard') 
     return render(request, 'login.html')
 
 
 def logout_view(request):
     logout(request)
     return redirect('login')
+
+
+@login_required
+def dashboard_redirect(request):
+    user = request.user
+
+    if user.role == 'customer':
+        return redirect('customer_dashboard')
+
+    elif user.role == 'vendor':
+        return redirect('vendor_dashboard')
+
+    elif user.role == 'delivery':
+        return redirect('delivery_dashboard')
+
+    return redirect('login')
+
+
+@login_required
+def customer_dashboard(request):
+    return render(request, 'customer_dashboard.html')
+
+
+@login_required
+def vendor_dashboard(request):
+    return render(request, 'vendor_dashboard.html')
+
+
+@login_required
+def delivery_dashboard(request):
+    return render(request, 'delivery_dashboard.html')
