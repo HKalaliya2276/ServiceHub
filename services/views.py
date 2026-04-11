@@ -22,3 +22,9 @@ def add_service(request):
         return redirect('vendor_dashboard')
 
     return render(request, 'add_service.html')
+
+
+@login_required
+def service_list(request):
+    services = Service.objects.all().order_by('-created_at')
+    return render(request, 'service_list.html', {'services': services})

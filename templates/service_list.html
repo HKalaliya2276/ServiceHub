@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h2>All Services</h2>
+
+{% for service in services %}
+    <div style="border:1px solid black; margin:10px; padding:10px;">
+        <h3>{{ service.title }}</h3>
+        <p>{{ service.description }}</p>
+        <p><strong>Price:</strong> ₹{{ service.price }}</p>
+        <p><strong>Vendor:</strong> {{ service.vendor.username }}</p>
+    </div>
+{% endfor %}
+
+{% endblock %}
