@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import get_user_model
 from .models import Booking, Service
+from django.core.paginator import Paginator
 
 User = get_user_model()
 
@@ -44,7 +45,11 @@ def service_list(request):
     if max_price:
         services = services.filter(price__lte=max_price)
 
-    return render(request, 'service_list.html', {'services': services})
+    paginator = Paginator(services, 5)  # 5 per page
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
+    return render(request, 'service_list.html', {'page_obj': page_obj})
 
 
 @login_required

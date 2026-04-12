@@ -12,7 +12,7 @@
     <button type="submit">Search</button>
 </form>
 
-{% for service in services %}
+{% for service in page_obj %}
     <div style="border:1px solid black; margin:10px; padding:10px;">
         <h3>{{ service.title }}</h3>
         <p>{{ service.description }}</p>
@@ -22,5 +22,27 @@
         <a href="/services/book/{{ service.id }}/">Book Now</a>
     </div>
 {% endfor %}
+
+<div>
+    {% if page_obj.has_previous %}
+        <a href="?page=1&q={{ request.GET.q }}&min_price={{ request.GET.min_price }}&max_price={{ request.GET.max_price }}">First</a>
+
+        <a href="?page={{ page_obj.previous_page_number }}&q={{ request.GET.q }}&min_price={{ request.GET.min_price }}&max_price={{ request.GET.max_price }}">
+            Previous
+        </a>
+    {% endif %}
+
+    <span>Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+
+    {% if page_obj.has_next %}
+        <a href="?page={{ page_obj.next_page_number }}&q={{ request.GET.q }}&min_price={{ request.GET.min_price }}&max_price={{ request.GET.max_price }}">
+            Next
+        </a>
+
+        <a href="?page={{ page_obj.paginator.num_pages }}&q={{ request.GET.q }}&min_price={{ request.GET.min_price }}&max_price={{ request.GET.max_price }}">
+            Last
+        </a>
+    {% endif %}
+</div>
 
 {% endblock %}
