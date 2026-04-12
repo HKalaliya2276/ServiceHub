@@ -30,6 +30,20 @@ def add_service(request):
 @login_required
 def service_list(request):
     services = Service.objects.all().order_by('-created_at')
+
+    query = request.GET.get('q')
+    min_price = request.GET.get('min_price')
+    max_price = request.GET.get('max_price')
+
+    if query:
+        services = services.filter(title__icontains=query)
+
+    if min_price:
+        services = services.filter(price__gte=min_price)
+
+    if max_price:
+        services = services.filter(price__lte=max_price)
+
     return render(request, 'service_list.html', {'services': services})
 
 
