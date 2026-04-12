@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h2>My Bookings</h2>
+
+{% for booking in bookings %}
+    <div style="border:1px solid black; margin:10px; padding:10px;">
+        <p><strong>Service:</strong> {{ booking.service.title }}</p>
+        <p><strong>Status:</strong> {{ booking.status }}</p>
+        <p><strong>Vendor:</strong> {{ booking.service.vendor.username }}</p>
+
+        {% if booking.delivery_boy %}
+            <p><strong>Delivery Boy:</strong> {{ booking.delivery_boy.username }}</p>
+        {% endif %}
+    </div>
+{% endfor %}
+
+{% endblock %}

@@ -118,3 +118,13 @@ def update_delivery_status(request, booking_id, status):
     booking.save()
 
     return redirect('delivery_dashboard')
+
+
+@login_required
+def customer_bookings(request):
+    if request.user.role != 'customer':
+        return redirect('dashboard')
+
+    bookings = Booking.objects.filter(customer=request.user).order_by('-booking_date')
+
+    return render(request, 'customer_bookings.html', {'bookings': bookings})
