@@ -33,6 +33,7 @@ class Booking(models.Model):
     blank=True,
     related_name='deliveries'
 )
+    payment_status = models.CharField(max_length=20, default='pending')
 
     def __str__(self):
         return f"{self.customer.username} - {self.service.title}"

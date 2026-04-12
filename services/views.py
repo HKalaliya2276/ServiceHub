@@ -5,6 +5,7 @@ from django.contrib.auth import get_user_model
 from .models import Booking, Service
 from django.core.paginator import Paginator
 from django.shortcuts import get_object_or_404
+from rapidfuzz import fuzz
 
 User = get_user_model()
 
@@ -201,3 +202,18 @@ def customer_bookings(request):
     bookings = Booking.objects.filter(customer=request.user).order_by('-booking_date')
 
     return render(request, 'customer_bookings.html', {'bookings': bookings})
+
+
+@login_required
+def make_payment(request, booking_id):
+    booking = get_object_or_404(Booking, id=booking_id)
+
+    if booking.customer != request.user:
+        return redirect('dashboard')
+
+    # Fake payment success
+    booking.payment_status = 'paid'
+    booking.status = 'accepted'
+    booking.save()
+
+    return redirect('customer_bookings')

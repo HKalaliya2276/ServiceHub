@@ -9,6 +9,13 @@
         <p><strong>Status:</strong> {{ booking.status }}</p>
         <p><strong>Vendor:</strong> {{ booking.service.vendor.username }}</p>
 
+        <br>
+        {% if booking.payment_status == 'pending' %}
+    <a href="/services/pay/{{ booking.id }}/" class="btn btn-primary">
+        Pay Now
+    </a>
+{% endif %}
+
         {% if booking.delivery_boy %}
             <p><strong>Delivery Boy:</strong> {{ booking.delivery_boy.username }}</p>
         {% endif %}
