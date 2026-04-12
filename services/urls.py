@@ -10,4 +10,8 @@ urlpatterns = [
     path('assign-delivery/<int:booking_id>/', views.assign_delivery, name='assign_delivery'),
     path('delivery-update/<int:booking_id>/<str:status>/', views.update_delivery_status, name='delivery_update'),
     path('my-bookings/', views.customer_bookings, name='customer_bookings'),
+    path('my-services/', views.my_services, name='my_services'),
+    path('create/', views.create_service, name='create_service'),
+    path('edit/<int:id>/', views.edit_service, name='edit_service'),
+    path('delete/<int:id>/', views.delete_service, name='delete_service'),
 ]

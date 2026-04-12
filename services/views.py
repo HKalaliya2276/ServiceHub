@@ -1,8 +1,10 @@
+from django.http import HttpResponse
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import get_user_model
 from .models import Booking, Service
 from django.core.paginator import Paginator
+from django.shortcuts import get_object_or_404
 
 User = get_user_model()
 
@@ -75,6 +77,58 @@ def vendor_bookings(request):
     bookings = Booking.objects.filter(service__vendor=request.user)
 
     return render(request, 'vendor_bookings.html', {'bookings': bookings})
+
+
+@login_required
+def my_services(request):
+    services = Service.objects.filter(vendor=request.user)
+    return render(request, 'my_services.html', {'services': services})
+
+
+@login_required
+def create_service(request):
+    if request.method == "POST":
+        title = request.POST.get('title')
+        description = request.POST.get('description')
+        price = request.POST.get('price')
+
+        Service.objects.create(
+            vendor=request.user,
+            title=title,
+            description=description,
+            price=price
+        )
+        return redirect('my_services')
+
+    return render(request, 'services/create_service.html')
+
+
+@login_required
+def edit_service(request, id):
+    service = Service.objects.get(id=id)   
+
+    if service.vendor != request.user:    
+        return HttpResponse("Unauthorized", status=403)
+
+    if request.method == "POST":
+        service.title = request.POST.get('title')
+        service.description = request.POST.get('description')
+        service.price = request.POST.get('price')
+        service.save()
+
+        return redirect('my_services')
+
+    return render(request, 'edit_service.html', {'service': service})
+
+@login_required
+def delete_service(request, id):
+    service = Service.objects.get(id=id)   
+
+    if service.vendor != request.user:    
+        return HttpResponse("Unauthorized", status=403)
+
+    service.delete()
+    return redirect('my_services')
 
 
 @login_required

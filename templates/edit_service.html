@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<h2>Edit Service</h2>
+
+<form method="POST">
+    {% csrf_token %}
+
+    <input type="text" name="title" class="form-control mb-2" value="{{ service.title }}">
+
+    <textarea name="description" class="form-control mb-2">{{ service.description }}</textarea>
+
+    <input type="number" name="price" class="form-control mb-2" value="{{ service.price }}">
+
+    <button class="btn btn-warning">Update</button>
+</form>
+
+{% endblock %}

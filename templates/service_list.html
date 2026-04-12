@@ -2,47 +2,104 @@
 
 {% block content %}
 
-<h2>All Services</h2>
+<div class="container mt-4">
 
-<form method="GET">
-    <input type="text" name="q" placeholder="Search service">
-    <input type="number" name="min_price" placeholder="Min price">
-    <input type="number" name="max_price" placeholder="Max price">
+    <h2 class="mb-4">All Services</h2>
 
-    <button type="submit">Search</button>
-</form>
+    <!-- 🔍 Search + Filters -->
+    <form method="GET" class="row g-2 mb-4">
 
-{% for service in page_obj %}
-    <div style="border:1px solid black; margin:10px; padding:10px;">
-        <h3>{{ service.title }}</h3>
-        <p>{{ service.description }}</p>
-        <p><strong>Price:</strong> ₹{{ service.price }}</p>
-        <p><strong>Vendor:</strong> {{ service.vendor.username }}</p>
+        <div class="col-md-4">
+            <input type="text" name="q" class="form-control"
+                   placeholder="Search service"
+                   value="{{ request.GET.q }}">
+        </div>
 
-        <a href="/services/book/{{ service.id }}/">Book Now</a>
+        <div class="col-md-3">
+            <input type="number" name="min_price" class="form-control"
+                   placeholder="Min price"
+                   value="{{ request.GET.min_price }}">
+        </div>
+
+        <div class="col-md-3">
+            <input type="number" name="max_price" class="form-control"
+                   placeholder="Max price"
+                   value="{{ request.GET.max_price }}">
+        </div>
+
+        <div class="col-md-2">
+            <button class="btn btn-primary w-100">Search</button>
+        </div>
+
+    </form>
+
+    <!-- 🛠️ Services List -->
+    <div class="row">
+        {% for service in page_obj %}
+        <div class="col-md-4">
+            <div class="card mb-4 shadow-sm">
+                <div class="card-body">
+
+                    <h5 class="card-title">{{ service.title }}</h5>
+
+                    <p class="card-text">
+                        {{ service.description|truncatewords:15 }}
+                    </p>
+
+                    <p><strong>₹{{ service.price }}</strong></p>
+
+                    <p class="text-muted">
+                        By {{ service.vendor.username }}
+                    </p>
+
+                    <a href="/services/book/{{ service.id }}/"
+                       class="btn btn-success w-100">
+                        Book Now
+                    </a>
+
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-12 text-center">
+            <p>No services found 😢</p>
+        </div>
+        {% endfor %}
     </div>
-{% endfor %}
 
-<div>
-    {% if page_obj.has_previous %}
-        <a href="?page=1&q={{ request.GET.q }}&min_price={{ request.GET.min_price }}&max_price={{ request.GET.max_price }}">First</a>
+    <!-- 📄 Pagination -->
+    <div class="d-flex justify-content-center align-items-center gap-2">
 
-        <a href="?page={{ page_obj.previous_page_number }}&q={{ request.GET.q }}&min_price={{ request.GET.min_price }}&max_price={{ request.GET.max_price }}">
-            Previous
-        </a>
-    {% endif %}
+        {% if page_obj.has_previous %}
+            <a class="btn btn-outline-secondary btn-sm"
+               href="?page=1&q={{ request.GET.q }}&min_price={{ request.GET.min_price }}&max_price={{ request.GET.max_price }}">
+               First
+            </a>
 
-    <span>Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+            <a class="btn btn-outline-secondary btn-sm"
+               href="?page={{ page_obj.previous_page_number }}&q={{ request.GET.q }}&min_price={{ request.GET.min_price }}&max_price={{ request.GET.max_price }}">
+               Previous
+            </a>
+        {% endif %}
 
-    {% if page_obj.has_next %}
-        <a href="?page={{ page_obj.next_page_number }}&q={{ request.GET.q }}&min_price={{ request.GET.min_price }}&max_price={{ request.GET.max_price }}">
-            Next
-        </a>
+        <span class="mx-2">
+            Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+        </span>
 
-        <a href="?page={{ page_obj.paginator.num_pages }}&q={{ request.GET.q }}&min_price={{ request.GET.min_price }}&max_price={{ request.GET.max_price }}">
-            Last
-        </a>
-    {% endif %}
+        {% if page_obj.has_next %}
+            <a class="btn btn-outline-secondary btn-sm"
+               href="?page={{ page_obj.next_page_number }}&q={{ request.GET.q }}&min_price={{ request.GET.min_price }}&max_price={{ request.GET.max_price }}">
+               Next
+            </a>
+
+            <a class="btn btn-outline-secondary btn-sm"
+               href="?page={{ page_obj.paginator.num_pages }}&q={{ request.GET.q }}&min_price={{ request.GET.min_price }}&max_price={{ request.GET.max_price }}">
+               Last
+            </a>
+        {% endif %}
+
+    </div>
+
 </div>
 
 {% endblock %}

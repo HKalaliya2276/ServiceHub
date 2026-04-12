@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<h2>My Services</h2>
+
+<div class="row">
+
+    {% for service in services %}
+    <div class="col-md-4">
+        <div class="card mb-4 shadow-sm">
+            <div class="card-body">
+
+                <h5>{{ service.title }}</h5>
+                <p>{{ service.description }}</p>
+                <p><strong>₹{{ service.price }}</strong></p>
+
+                <a href="/services/edit/{{ service.id }}/" class="btn btn-warning w-100 mb-2">
+                    Edit
+                </a>
+
+                <a href="/services/delete/{{ service.id }}/" class="btn btn-danger w-100">
+                    Delete
+                </a>
+
+            </div>
+        </div>
+    </div>
+    {% empty %}
+        <p>No services added yet</p>
+    {% endfor %}
+
+</div>
+
+<a href="/services/create/" class="btn btn-success">
+    + Add New Service
+</a>
+
+{% endblock %}
