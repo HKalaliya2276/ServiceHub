@@ -18,6 +18,13 @@ class Booking(models.Model):
     service      = models.ForeignKey(Service, on_delete=models.CASCADE)
     booking_date = models.DateTimeField(default=timezone.now)
     status       = models.CharField(max_length=20, default='pending')
+    delivery_boy = models.ForeignKey(
+    User,
+    on_delete=models.SET_NULL,
+    null=True,
+    blank=True,
+    related_name='deliveries'
+)
 
     def __str__(self):
         return f"{self.customer.username} - {self.service.title}"

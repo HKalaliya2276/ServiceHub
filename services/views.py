@@ -1,6 +1,9 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth import get_user_model
 from .models import Booking, Service
+
+User = get_user_model()
 
 @login_required
 def add_service(request):
@@ -70,3 +73,31 @@ def update_booking_status(request, booking_id, status):
     booking.save()
 
     return redirect('vendor_bookings')
+
+
+@login_required
+def assign_delivery(request, booking_id):
+    if request.user.role != 'vendor':
+        return redirect('dashboard')
+
+    booking = Booking.objects.get(id=booking_id)
+
+    if booking.service.vendor != request.user:
+        return redirect('dashboard')
+
+    # Get all delivery boys
+    delivery_boys = User.objects.filter(role='delivery')
+
+    if request.method == 'POST':
+        delivery_id = request.POST.get('delivery_id')
+        delivery_user = User.objects.get(id=delivery_id)
+
+        booking.delivery_boy = delivery_user
+        booking.save()
+
+        return redirect('vendor_bookings')
+
+    return render(request, 'assign_delivery.html', {
+        'booking': booking,
+        'delivery_boys': delivery_boys
+    })

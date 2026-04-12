@@ -2,5 +2,13 @@
 
 {% block content %}
 <h2>Delivery Dashboard</h2>
-<p>Welcome Delivery Boy 🚚</p>
+
+{% for booking in deliveries %}
+    <div style="border:1px solid black; margin:10px; padding:10px;">
+        <p><strong>Service:</strong> {{ booking.service.title }}</p>
+        <p><strong>Customer:</strong> {{ booking.customer.username }}</p>
+        <p><strong>Status:</strong> {{ booking.status }}</p>
+    </div>
+{% endfor %}
+
 {% endblock %}

@@ -62,4 +62,5 @@ def vendor_dashboard(request):
 
 @login_required
 def delivery_dashboard(request):
-    return render(request, 'delivery_dashboard.html')
+    deliveries = request.user.deliveries.all()
+    return render(request, 'delivery_dashboard.html', {'deliveries': deliveries})
