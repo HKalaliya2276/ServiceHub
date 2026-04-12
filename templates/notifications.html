@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<h2>Notifications</h2>
+
+{% for n in notifications %}
+<div class="card p-2 mb-2">
+    {{ n.message }}
+</div>
+{% endfor %}
+
+{% endblock %}

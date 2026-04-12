@@ -2,7 +2,7 @@ from django.http import HttpResponse
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import get_user_model
-from .models import Booking, Service
+from .models import Booking, Notification, Service
 from django.core.paginator import Paginator
 from django.shortcuts import get_object_or_404
 from rapidfuzz import fuzz
@@ -66,6 +66,11 @@ def book_service(request, service_id):
         customer=request.user,
         service=service
     )
+
+    Notification.objects.create(
+    user=service.vendor,
+    message=f"New booking for {service.title}"
+)
 
     return redirect('customer_dashboard')
 
@@ -146,6 +151,11 @@ def update_booking_status(request, booking_id, status):
     booking.status = status
     booking.save()
 
+    Notification.objects.create(
+    user=booking.customer,
+    message=f"Your booking for {booking.service.title} is {status}"
+)
+
     return redirect('vendor_bookings')
 
 
@@ -168,6 +178,11 @@ def assign_delivery(request, booking_id):
 
         booking.delivery_boy = delivery_user
         booking.save()
+
+        Notification.objects.create(
+    user=delivery_user,
+    message=f"You have been assigned a delivery for {booking.service.title}"
+)
 
         return redirect('vendor_bookings')
 
@@ -217,3 +232,9 @@ def make_payment(request, booking_id):
     booking.save()
 
     return redirect('customer_bookings')
+
+
+@login_required
+def notifications(request):
+    user_notifications = Notification.objects.filter(user=request.user).order_by('-created_at')
+    return render(request, 'notifications.html', {'notifications': user_notifications})

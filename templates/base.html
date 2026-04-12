@@ -66,6 +66,16 @@
 
         </div>
 
+        <a href="/services/notifications/" class="btn btn-warning position-relative">
+    Notifications
+
+    {% if unread_count > 0 %}
+        <span class="position-absolute top-0 start-100 translate-middle badge bg-danger">
+            {{ unread_count }}
+        </span>
+    {% endif %}
+</a>
+
     </div>
 </nav>
 
@@ -73,6 +83,37 @@
 <div class="container mt-4">
     {% block content %}{% endblock %}
 </div>
+
+<div id="notification-box" style="position:fixed; top:20px; right:20px; z-index:9999;"></div>
+
+<script>
+function showNotification(message) {
+    let box = document.getElementById("notification-box");
+
+    let div = document.createElement("div");
+    div.innerHTML = message;
+    div.style.background = "black";
+    div.style.color = "white";
+    div.style.padding = "10px";
+    div.style.marginTop = "10px";
+
+    box.appendChild(div);
+
+    setTimeout(() => {
+        div.remove();
+    }, 3000);
+}
+</script>
+
+<script>
+setInterval(function(){
+    fetch('/services/notifications/')
+    .then(response => response.text())
+    .then(data => {
+        console.log("Checking notifications...");
+    });
+}, 2000);
+</script>
 
 </body>
 </html>

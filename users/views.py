@@ -3,6 +3,10 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, login
 from .forms import UserRegisterForm
 from django.contrib.auth import logout
+from services.models import Notification
+
+def get_unread_count(user):
+    return Notification.objects.filter(user=user, is_read=False).count()
 
 def register_view(request):
     if request.method == 'POST':
@@ -52,7 +56,8 @@ def dashboard_redirect(request):
 
 @login_required
 def customer_dashboard(request):
-    return render(request, 'customer_dashboard.html')
+    unread_count = Notification.objects.filter(user=request.user, is_read=False).count()
+    return render(request, 'customer_dashboard.html', {'unread_count': unread_count})
 
 
 @login_required
