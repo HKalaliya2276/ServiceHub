@@ -43,3 +43,30 @@ def book_service(request, service_id):
     )
 
     return redirect('customer_dashboard')
+
+
+@login_required
+def vendor_bookings(request):
+    if request.user.role != 'vendor':
+        return redirect('dashboard')
+
+    bookings = Booking.objects.filter(service__vendor=request.user)
+
+    return render(request, 'vendor_bookings.html', {'bookings': bookings})
+
+
+@login_required
+def update_booking_status(request, booking_id, status):
+    if request.user.role != 'vendor':
+        return redirect('dashboard')
+
+    booking = Booking.objects.get(id=booking_id)
+
+    # Security check
+    if booking.service.vendor != request.user:
+        return redirect('dashboard')
+
+    booking.status = status
+    booking.save()
+
+    return redirect('vendor_bookings')
