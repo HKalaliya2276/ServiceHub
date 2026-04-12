@@ -9,6 +9,8 @@
         <p>{{ service.description }}</p>
         <p><strong>Price:</strong> ₹{{ service.price }}</p>
         <p><strong>Vendor:</strong> {{ service.vendor.username }}</p>
+
+        <a href="/services/book/{{ service.id }}/">Book Now</a>
     </div>
 {% endfor %}
 
