@@ -14,11 +14,19 @@ class Service(models.Model):
     
 
 class Booking(models.Model):
-    customer     = models.ForeignKey(User, on_delete=models.CASCADE, related_name='customer_bookings')
-    service      = models.ForeignKey(Service, on_delete=models.CASCADE)
-    booking_date = models.DateTimeField(default=timezone.now)
-    status       = models.CharField(max_length=20, default='pending')
-    delivery_boy = models.ForeignKey(
+    customer       = models.ForeignKey(User, on_delete=models.CASCADE, related_name='customer_bookings')
+    service        = models.ForeignKey(Service, on_delete=models.CASCADE)
+    booking_date   = models.DateTimeField(default=timezone.now)
+    STATUS_CHOICES = (
+    ('pending', 'Pending'),
+    ('accepted', 'Accepted'),
+    ('out_for_delivery', 'Out for Delivery'),
+    ('completed', 'Completed'),
+    ('rejected', 'Rejected'),
+)
+
+    status         = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
+    delivery_boy   = models.ForeignKey(
     User,
     on_delete=models.SET_NULL,
     null=True,

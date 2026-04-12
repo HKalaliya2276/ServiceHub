@@ -8,6 +8,14 @@
         <p><strong>Service:</strong> {{ booking.service.title }}</p>
         <p><strong>Customer:</strong> {{ booking.customer.username }}</p>
         <p><strong>Status:</strong> {{ booking.status }}</p>
+
+        {% if booking.status == 'accepted' %}
+            <a href="/services/delivery-update/{{ booking.id }}/out_for_delivery/">Start Delivery</a>
+        {% endif %}
+
+        {% if booking.status == 'out_for_delivery' %}
+            <a href="/services/delivery-update/{{ booking.id }}/completed/">Mark Completed</a>
+        {% endif %}
     </div>
 {% endfor %}
 

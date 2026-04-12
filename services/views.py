@@ -101,3 +101,20 @@ def assign_delivery(request, booking_id):
         'booking': booking,
         'delivery_boys': delivery_boys
     })
+
+
+@login_required
+def update_delivery_status(request, booking_id, status):
+    if request.user.role != 'delivery':
+        return redirect('dashboard')
+
+    booking = Booking.objects.get(id=booking_id)
+
+    # Security check
+    if booking.delivery_boy != request.user:
+        return redirect('dashboard')
+
+    booking.status = status
+    booking.save()
+
+    return redirect('delivery_dashboard')
