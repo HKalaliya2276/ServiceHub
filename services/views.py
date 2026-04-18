@@ -7,7 +7,18 @@ from django.core.paginator import Paginator
 from django.shortcuts import get_object_or_404
 from rapidfuzz import fuzz
 from django.http import JsonResponse
+from asgiref.sync import async_to_sync
+from channels.layers import get_channel_layer
 
+channel_layer = get_channel_layer()
+
+async_to_sync(channel_layer.group_send)(
+    "notifications",
+    {
+        "type": "send_notification",
+        "message": "New booking received"
+    }
+)
 
 User = get_user_model()
 

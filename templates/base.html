@@ -78,6 +78,7 @@
 <script>
 const shownNotifications = new Set();
 
+// 🔔 Badge update
 function updateBadgeCount(count) {
     const badge = document.getElementById("notif-badge");
     if (badge) {
@@ -85,6 +86,7 @@ function updateBadgeCount(count) {
     }
 }
 
+// 🔔 Mark read API
 async function markNotificationAsRead(id) {
     const response = await fetch(`/services/mark-read/${id}/`, {
         method: "GET",
@@ -94,19 +96,11 @@ async function markNotificationAsRead(id) {
         }
     });
 
-    if (!response.ok) {
-        throw new Error(`HTTP ${response.status}`);
-    }
-
     const data = await response.json();
-
-    if (data.status !== "success") {
-        throw new Error(data.message || "Unable to mark notification as read.");
-    }
-
     return data;
 }
 
+// 🔔 Open notification
 async function openNotification(id, link, onSuccess) {
     const data = await markNotificationAsRead(id);
 
@@ -121,19 +115,18 @@ async function openNotification(id, link, onSuccess) {
     }
 }
 
+// 🌍 Global access
 window.NotificationCenter = {
     openNotification,
     updateBadgeCount
 };
 
+// 🔔 Popup UI
 function showNotification(message, link, id) {
     const container = document.getElementById("notification-container");
     const popup = document.createElement("div");
-    let isProcessing = false;
 
     popup.textContent = message;
-    popup.setAttribute("role", "button");
-    popup.tabIndex = 0;
     popup.style.background = "#333";
     popup.style.color = "#fff";
     popup.style.padding = "10px";
@@ -141,76 +134,61 @@ function showNotification(message, link, id) {
     popup.style.borderRadius = "5px";
     popup.style.cursor = "pointer";
 
-    const autoRemoveTimer = setTimeout(() => {
+    popup.onclick = async function() {
+        await openNotification(id, link);
+        shownNotifications.delete(id);
+        popup.remove();
+    };
+
+    container.appendChild(popup);
+
+    setTimeout(() => {
         shownNotifications.delete(id);
         popup.remove();
     }, 5000);
-
-    async function handleNotificationClick(event) {
-        event.preventDefault();
-        event.stopPropagation();
-
-        if (isProcessing) {
-            return;
-        }
-
-        isProcessing = true;
-        popup.style.opacity = "0.7";
-
-        try {
-            await openNotification(id, link, () => {
-                clearTimeout(autoRemoveTimer);
-                shownNotifications.delete(id);
-                popup.remove();
-            });
-        } catch (error) {
-            console.error("Notification read failed:", error);
-            isProcessing = false;
-            popup.style.opacity = "1";
-        }
-    }
-
-    popup.addEventListener("click", handleNotificationClick);
-    popup.addEventListener("keydown", event => {
-        if (event.key === "Enter" || event.key === " ") {
-            handleNotificationClick(event);
-        }
-    });
-
-    container.appendChild(popup);
 }
+
+// ----------------------
+// 🔥 WEBSOCKET ADDITION
+// ----------------------
+
+const socket = new WebSocket("ws://127.0.0.1:8000/ws/notifications/");
+
+socket.onmessage = function(event) {
+    const data = JSON.parse(event.data);
+
+    console.log("📡 WebSocket message:", data);
+
+    // 🔥 Show instantly
+    showNotification(data.message, "#", Date.now());
+
+    // 🔥 Increase badge instantly
+    const badge = document.getElementById("notif-badge");
+    if (badge) {
+        badge.innerText = parseInt(badge.innerText || "0") + 1;
+    }
+};
+
+// ----------------------
+// 🧠 FALLBACK POLLING
+// ----------------------
 
 async function fetchNotifications() {
-    try {
-        const response = await fetch("/services/get-notifications/", {
-            method: "GET",
-            credentials: "same-origin",
-            headers: {
-                "X-Requested-With": "XMLHttpRequest"
-            },
-            cache: "no-store"
-        });
+    const response = await fetch("/services/get-notifications/");
+    const data = await response.json();
 
-        if (!response.ok) {
-            return;
+    updateBadgeCount(data.unread_count ?? data.notifications.length);
+
+    data.notifications.forEach(n => {
+        if (!shownNotifications.has(n.id)) {
+            shownNotifications.add(n.id);
+            showNotification(n.message, n.link, n.id);
         }
-
-        const data = await response.json();
-        updateBadgeCount(data.unread_count ?? data.notifications.length);
-
-        data.notifications.forEach(notification => {
-            if (!shownNotifications.has(notification.id)) {
-                shownNotifications.add(notification.id);
-                showNotification(notification.message, notification.link, notification.id);
-            }
-        });
-    } catch (error) {
-        console.error("Notification fetch failed:", error);
-    }
+    });
 }
 
-fetchNotifications();
-setInterval(fetchNotifications, 5000);
+// Optional fallback (can remove later)
+setInterval(fetchNotifications, 10000);
 </script>
 {% endif %}
 
