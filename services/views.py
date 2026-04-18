@@ -6,6 +6,8 @@ from .models import Booking, Notification, Service
 from django.core.paginator import Paginator
 from django.shortcuts import get_object_or_404
 from rapidfuzz import fuzz
+from django.http import JsonResponse
+
 
 User = get_user_model()
 
@@ -62,14 +64,16 @@ def book_service(request, service_id):
     if request.user.role != 'customer':
         return redirect('dashboard')
 
-    Booking.objects.create(
+    booking = Booking.objects.create(
         customer=request.user,
         service=service
     )
 
     Notification.objects.create(
     user=service.vendor,
-    message=f"New booking for {service.title}"
+    message=f"New booking for {service.title}",
+    link=f"/services/vendor-bookings/#booking-{booking.id}",
+    is_read=False
 )
 
     return redirect('customer_dashboard')
@@ -153,7 +157,8 @@ def update_booking_status(request, booking_id, status):
 
     Notification.objects.create(
     user=booking.customer,
-    message=f"Your booking for {booking.service.title} is {status}"
+    message=f"Your booking for {booking.service.title} is {status}",
+    link=f"/services/my-bookings/#booking-{booking.id}"
 )
 
     return redirect('vendor_bookings')
@@ -180,9 +185,10 @@ def assign_delivery(request, booking_id):
         booking.save()
 
         Notification.objects.create(
-    user=delivery_user,
-    message=f"You have been assigned a delivery for {booking.service.title}"
-)
+        user=delivery_user,
+        message=f"You have been assigned a delivery for {booking.service.title}",
+        link=f"/delivery/#booking-{booking.id}"
+        )
 
         return redirect('vendor_bookings')
 
@@ -237,4 +243,54 @@ def make_payment(request, booking_id):
 @login_required
 def notifications(request):
     user_notifications = Notification.objects.filter(user=request.user).order_by('-created_at')
+
     return render(request, 'notifications.html', {'notifications': user_notifications})
+
+# 🔥 Get unread notifications
+@login_required
+def get_notifications(request):
+    unread_notifications = Notification.objects.filter(
+        user=request.user,
+        is_read=False
+    ).order_by('-created_at')
+
+    data = []
+
+    for n in unread_notifications:
+        data.append({
+            'id': n.id,
+            'message': n.message,
+            'link': n.link if n.link else "#"
+        })
+
+    return JsonResponse({
+        'notifications': data,
+        'unread_count': unread_notifications.count()
+    })
+
+
+# 🔥 Mark as read
+@login_required
+def mark_single_read(request, notif_id):
+    try:
+        notif = Notification.objects.get(id=notif_id, user=request.user)
+    except Notification.DoesNotExist:
+        return JsonResponse({
+            'status': 'error',
+            'message': 'Notification not found.'
+        }, status=404)
+
+    if not notif.is_read:
+        notif.is_read = True
+        notif.save(update_fields=['is_read'])
+
+    unread_count = Notification.objects.filter(
+        user=request.user,
+        is_read=False
+    ).count()
+
+    return JsonResponse({
+        'status': 'success',
+        'message': 'Notification marked as read.',
+        'unread_count': unread_count
+    })

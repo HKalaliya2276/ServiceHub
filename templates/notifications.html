@@ -5,9 +5,83 @@
 <h2>Notifications</h2>
 
 {% for n in notifications %}
-<div class="card p-2 mb-2">
-    {{ n.message }}
+<div class="card mb-2 p-3 notification-item {% if not n.is_read %}notification-unread{% endif %}"
+     data-notification-id="{{ n.id }}"
+     data-notification-link="{{ n.link|default:'#' }}"
+     {% if not n.is_read %}role="button" tabindex="0"{% endif %}
+     style="{% if not n.is_read %}cursor:pointer;{% endif %}">
+    {% if n.link %}
+        <a href="{{ n.link }}"
+           class="notification-link"
+           data-notification-id="{{ n.id }}"
+           data-notification-link="{{ n.link }}"
+           style="text-decoration:none; color:black;">
+            {{ n.message }}
+        </a>
+    {% else %}
+        <p class="mb-0">{{ n.message }}</p>
+    {% endif %}
+
+    <small class="text-muted d-block mt-2">
+        {{ n.created_at|date:"d M Y, H:i" }}
+    </small>
+
+    {% if not n.is_read %}
+        <span class="badge bg-primary mt-2">New</span>
+    {% else %}
+        <span class="badge bg-secondary mt-2">Read</span>
+    {% endif %}
 </div>
 {% endfor %}
+
+{% if not notifications %}
+<div class="alert alert-info">No notifications yet.</div>
+{% endif %}
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    document.querySelectorAll(".notification-item.notification-unread[data-notification-id]").forEach(card => {
+        let isProcessing = false;
+
+        async function handleCardClick(event) {
+            if (!card.classList.contains("notification-unread") || isProcessing) {
+                return;
+            }
+
+            event.preventDefault();
+
+            try {
+                isProcessing = true;
+                await window.NotificationCenter.openNotification(
+                    card.dataset.notificationId,
+                    card.dataset.notificationLink,
+                    function() {
+                        card.classList.remove("notification-unread");
+
+                        const unreadBadge = card.querySelector(".badge.bg-primary");
+                        if (unreadBadge) {
+                            unreadBadge.classList.remove("bg-primary");
+                            unreadBadge.classList.add("bg-secondary");
+                            unreadBadge.innerText = "Read";
+                        }
+
+                        card.style.cursor = "default";
+                    }
+                );
+            } catch (error) {
+                isProcessing = false;
+                console.error("Notification page read failed:", error);
+            }
+        }
+
+        card.addEventListener("click", handleCardClick);
+        card.addEventListener("keydown", function(event) {
+            if (event.key === "Enter" || event.key === " ") {
+                handleCardClick(event);
+            }
+        });
+    });
+});
+</script>
 
 {% endblock %}

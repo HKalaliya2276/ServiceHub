@@ -1,4 +1,11 @@
 __pycache__/
-.env
-node_modules/
+*.pyc
+*.pyo
+*.pyd
 db.sqlite3
+.env
+venv/
+kvenv/
+.env/
+media/
+staticfiles/

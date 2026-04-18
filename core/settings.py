@@ -6,6 +6,7 @@ import os
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 AUTH_USER_MODEL = 'users.User'
+LOGIN_URL = '/login/'
 
 
 # Quick-start development settings - unsuitable for production

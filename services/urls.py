@@ -16,4 +16,6 @@ urlpatterns = [
     path('delete/<int:id>/', views.delete_service, name='delete_service'),
     path('pay/<int:booking_id>/', views.make_payment, name='make_payment'),
     path('notifications/', views.notifications, name='notifications'),
+    path('get-notifications/', views.get_notifications, name='get_notifications'),
+    path('mark-read/<int:notif_id>/', views.mark_single_read, name='mark_single_read'),
 ]
