@@ -37,18 +37,8 @@ class Booking(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"{self.customer.username} - {self.service.title}"
-    
+        return f"{self.customer.username} - {self.service.title}"    
 
-# class Notification(models.Model):
-#     user       = models.ForeignKey(User, on_delete=models.CASCADE)
-#     message    = models.TextField()
-#     is_read    = models.BooleanField(default=False)
-#     created_at = models.DateTimeField(auto_now_add=True)
-#     link       = models.CharField(max_length=255, blank=True, null=True)
-
-#     def __str__(self):
-#         return f"{self.user.username} - {self.message}"
 
 class Notification(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -59,3 +49,13 @@ class Notification(models.Model):
 
     def __str__(self):
         return self.message
+    
+
+class ChatMessage(models.Model):
+    booking = models.ForeignKey('Booking', on_delete=models.CASCADE)
+    sender = models.ForeignKey(User, on_delete=models.CASCADE)
+    message = models.TextField()
+    timestamp = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.message[:30]

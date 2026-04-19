@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>ServiceHub Chat</title>
+    <style>
+        #chat-container { max-width: 600px; margin: 20px auto; }
+        #status { padding: 5px; border-radius: 4px; margin-bottom: 10px; }
+        .connected { background: #d4edda; color: #155724; }
+        .disconnected { background: #f8d7da; color: #721c24; }
+        #chat-box { 
+            height: 400px; 
+            overflow-y: auto; 
+            border: 1px solid #ddd; 
+            padding: 10px; 
+            background: #fafafa;
+            margin-bottom: 10px;
+            border-radius: 4px;
+        }
+        .message { margin-bottom: 10px; }
+        .message strong { color: #007bff; }
+        #message-input { 
+            width: 70%; 
+            padding: 10px; 
+            border: 1px solid #ddd; 
+            border-radius: 4px; 
+        }
+        button { 
+            padding: 10px 20px; 
+            background: #007bff; 
+            color: white; 
+            border: none; 
+            border-radius: 4px; 
+            cursor: pointer; 
+        }
+        button:hover { background: #0056b3; }
+        .timestamp { font-size: 0.8em; color: #666; }
+    </style>
+</head>
+<body>
+    <div id="chat-container">
+        <h3>Chat - {{ service_title }}</h3>
+        <p><strong>With:</strong> {{ other_user.username }}</p>
+        
+        <div id="status">Connecting...</div>
+        <div id="chat-box"></div>
+        
+        <input type="text" id="message-input" placeholder="Type your message... (Enter to send)">
+        <button onclick="sendMessage()">Send</button>
+    </div>
+
+    <script>
+        const bookingId = "{{ booking.id }}";
+        const socket = new WebSocket(`ws://localhost:8000/ws/chat/${bookingId}/`);
+        const statusEl = document.getElementById('status');
+        const chatBox = document.getElementById('chat-box');
+        const input = document.getElementById('message-input');
+
+        // Connection status
+        socket.onopen = function() {
+            statusEl.textContent = '🟢 Connected';
+            statusEl.className = 'connected';
+            loadHistory();
+        };
+
+        socket.onclose = function() {
+            statusEl.textContent = '🔴 Disconnected';
+            statusEl.className = 'disconnected';
+        };
+
+        socket.onerror = function() {
+            statusEl.textContent = '❌ Error';
+            statusEl.className = 'disconnected';
+        };
+
+        socket.onmessage = function(e) {
+            const data = JSON.parse(e.data);
+            addMessage(data.sender, data.message);
+            scrollToBottom();
+        };
+
+        input.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') sendMessage();
+        });
+
+        function sendMessage() {
+            if (input.value.trim() === '') return;
+            socket.send(JSON.stringify({ message: input.value }));
+            input.value = '';
+        }
+
+        function addMessage(sender, message) {
+            const div = document.createElement('div');
+            div.className = 'message';
+            div.innerHTML = `<strong>${sender}:</strong> ${message}`;
+            chatBox.appendChild(div);
+        }
+
+        function scrollToBottom() {
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
+
+        async function loadHistory() {
+            try {
+                const response = await fetch(`/services/chat-history/${bookingId}/`);
+                const data = await response.json();
+                if (data.error) {
+                    console.error(data.error);
+                    return;
+                }
+                data.messages.forEach(msg => {
+                    addMessage(msg.sender, msg.message);
+                });
+                scrollToBottom();
+            } catch (err) {
+                console.error('Failed to load history:', err);
+            }
+        }
+    </script>
+</body>
+</html>

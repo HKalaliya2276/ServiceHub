@@ -160,7 +160,7 @@ socket.onmessage = function(event) {
     console.log("📡 WebSocket message:", data);
 
     // 🔥 Show instantly
-    showNotification(data.message, "#", Date.now());
+    showNotification(data.message, data.link, Date.now());
 
     // 🔥 Increase badge instantly
     const badge = document.getElementById("notif-badge");

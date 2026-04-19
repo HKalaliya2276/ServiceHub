@@ -18,4 +18,6 @@ urlpatterns = [
     path('notifications/', views.notifications, name='notifications'),
     path('get-notifications/', views.get_notifications, name='get_notifications'),
     path('mark-read/<int:notif_id>/', views.mark_single_read, name='mark_single_read'),
+    path('chat/<int:booking_id>/', views.chat_view, name='chat'),
+    path('chat-history/<int:booking_id>/', views.get_chat_history, name='chat_history'),
 ]

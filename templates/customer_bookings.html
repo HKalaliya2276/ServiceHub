@@ -20,6 +20,10 @@
         {% if booking.delivery_boy %}
             <p><strong>Delivery Boy:</strong> {{ booking.delivery_boy.username }}</p>
         {% endif %}
+
+{% if booking.status == "accepted" %}
+<a href="{% url 'chat' booking.id %}" class="btn btn-primary btn-sm">💬 Chat with Vendor</a>
+{% endif %}
     </div>
 {% endfor %}
 

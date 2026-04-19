@@ -6,19 +6,10 @@ from .models import Booking, Notification, Service
 from django.core.paginator import Paginator
 from django.shortcuts import get_object_or_404
 from rapidfuzz import fuzz
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponseForbidden
 from asgiref.sync import async_to_sync
 from channels.layers import get_channel_layer
-
-channel_layer = get_channel_layer()
-
-async_to_sync(channel_layer.group_send)(
-    "notifications",
-    {
-        "type": "send_notification",
-        "message": "New booking received"
-    }
-)
+from .models import Booking, Notification, Service, ChatMessage
 
 User = get_user_model()
 
@@ -305,3 +296,36 @@ def mark_single_read(request, notif_id):
         'message': 'Notification marked as read.',
         'unread_count': unread_count
     })
+
+
+@login_required
+def get_chat_history(request, booking_id):
+    booking = get_object_or_404(Booking, id=booking_id)
+    
+    if request.user != booking.customer and request.user != booking.service.vendor:
+        return JsonResponse({'error': 'Unauthorized'}, status=403)
+    
+    messages = ChatMessage.objects.filter(booking=booking).order_by('-timestamp')[:50]
+    data = []
+    for msg in messages:
+        data.append({
+            'sender': msg.sender.username,
+            'message': msg.message,
+            'timestamp': msg.timestamp.strftime('%H:%M')
+        })
+    return JsonResponse({'messages': data[::-1]})  # Oldest first for UI
+
+@login_required
+def chat_view(request, booking_id):
+    booking = get_object_or_404(Booking, id=booking_id)
+    
+    if request.user != booking.customer and request.user != booking.service.vendor:
+        return HttpResponseForbidden("You can only chat about your bookings/services.")
+    
+    other_user = booking.service.vendor if request.user == booking.customer else booking.customer
+    context = {
+        'booking': booking,
+        'other_user': other_user,
+        'service_title': booking.service.title
+    }
+    return render(request, 'chat.html', context)
