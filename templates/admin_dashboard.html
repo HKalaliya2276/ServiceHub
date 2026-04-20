@@ -1,55 +1,142 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<h2>Admin Dashboard</h2>
 
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<h2 class="mb-4">Admin Dashboard</h2>
+
+<!-- 🔢 STATS -->
 <div class="row mb-4">
+
     <div class="col-md-3">
         <div class="card text-white bg-primary shadow">
             <div class="card-body text-center">
-                <h5>Total Users</h5>
+                <h6>Total Users</h6>
                 <h2>{{ total_users }}</h2>
             </div>
         </div>
     </div>
+
     <div class="col-md-3">
         <div class="card text-white bg-success shadow">
             <div class="card-body text-center">
-                <h5>Total Services</h5>
+                <h6>Total Services</h6>
                 <h2>{{ total_services }}</h2>
             </div>
         </div>
     </div>
+
     <div class="col-md-3">
         <div class="card text-white bg-info shadow">
             <div class="card-body text-center">
-                <h5>Total Bookings</h5>
+                <h6>Total Bookings</h6>
                 <h2>{{ total_bookings }}</h2>
             </div>
         </div>
     </div>
+
     <div class="col-md-3">
-        <div class="card text-white bg-warning shadow">
+        <div class="card text-dark bg-warning shadow">
             <div class="card-body text-center">
-                <h5>Total Revenue</h5>
+                <h6>Total Revenue</h6>
                 <h2>₹{{ revenue }}</h2>
             </div>
         </div>
     </div>
+
 </div>
 
 <hr>
 
+<!-- 📊 CHARTS -->
+<h3 class="mb-3">Analytics</h3>
+
+<div class="row mb-5">
+
+    <div class="col-md-6">
+        <div class="card shadow p-3">
+            <h6 class="text-center">Monthly Bookings</h6>
+            <canvas id="bookingChart"></canvas>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="card shadow p-3">
+            <h6 class="text-center">Monthly Revenue</h6>
+            <canvas id="revenueChart"></canvas>
+        </div>
+    </div>
+
+</div>
+
+<hr>
+
+<!-- 📋 RECENT BOOKINGS -->
 <h3>Recent Bookings</h3>
 
 {% for booking in recent_bookings %}
     <div class="card mb-3 shadow-sm">
         <div class="card-body">
             <h6 class="card-title">{{ booking.service.title }}</h6>
-            <p class="card-text"><strong>Customer:</strong> {{ booking.customer.username }}</p>
-            <span class="badge bg-{{ booking.status|lower|default:'secondary' }}">{{ booking.status }}</span>
+            <p class="card-text">
+                <strong>Customer:</strong> {{ booking.customer.username }}
+            </p>
+
+            <span class="badge bg-secondary">
+                {{ booking.status }}
+            </span>
         </div>
     </div>
+{% empty %}
+    <p>No recent bookings</p>
 {% endfor %}
+
+<!-- 📊 CHART SCRIPT -->
+<script>
+const months = {{ months|safe }};
+const bookings = {{ booking_counts|safe }};
+const revenue = {{ revenue_data|safe }};
+
+// 📊 Booking Chart
+new Chart(document.getElementById('bookingChart'), {
+    type: 'bar',
+    data: {
+        labels: months,
+        datasets: [{
+            label: 'Bookings',
+            data: bookings,
+            borderWidth: 1
+        }]
+    },
+    options: {
+        responsive: true,
+        plugins: {
+            legend: { display: true }
+        }
+    }
+});
+
+// 💰 Revenue Chart
+new Chart(document.getElementById('revenueChart'), {
+    type: 'line',
+    data: {
+        labels: months,
+        datasets: [{
+            label: 'Revenue',
+            data: revenue,
+            borderWidth: 2,
+            tension: 0.3
+        }]
+    },
+    options: {
+        responsive: true,
+        plugins: {
+            legend: { display: true }
+        }
+    }
+});
+</script>
 
 {% endblock %}

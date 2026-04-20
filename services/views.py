@@ -11,6 +11,8 @@ from asgiref.sync import async_to_sync
 from channels.layers import get_channel_layer
 from .models import Booking, Notification, Service, ChatMessage
 from django.db.models import Sum
+from django.db.models import Sum, Count
+from django.db.models.functions import TruncMonth
 
 User = get_user_model()
 
@@ -341,19 +343,40 @@ def admin_dashboard(request):
     total_services = Service.objects.count()
     total_bookings = Booking.objects.count()
 
-    # Revenue = only paid bookings
     revenue = Booking.objects.filter(payment_status='paid').aggregate(
         total=Sum('service__price')
     )['total'] or 0
 
     recent_bookings = Booking.objects.select_related('service', 'customer').order_by('-created_at')[:5]
 
+    # Monthly bookings
+    monthly_bookings = (
+        Booking.objects
+        .annotate(month=TruncMonth('created_at'))
+        .values('month')
+        .annotate(count=Count('id'))
+        .order_by('month')
+    )
+
+    # Monthly revenue
+    monthly_revenue = (
+        Booking.objects.filter(payment_status='paid')
+        .annotate(month=TruncMonth('created_at'))
+        .values('month')
+        .annotate(total=Sum('service__price'))
+        .order_by('month')
+    )
+
     context = {
         'total_users': total_users,
         'total_services': total_services,
         'total_bookings': total_bookings,
         'revenue': revenue,
-        'recent_bookings': recent_bookings
+        'recent_bookings': recent_bookings,
+        'months': [str(x['month'].strftime("%b")) for x in monthly_bookings],
+        'booking_counts': [x['count'] for x in monthly_bookings],
+
+        'revenue_data': [x['total'] or 0 for x in monthly_revenue],
     }
 
     return render(request, 'admin_dashboard.html', context)
