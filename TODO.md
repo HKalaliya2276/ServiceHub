@@ -1,8 +1,11 @@
-# Chat Fix Complete! ✅
+# Registration/Login Fix In Progress ✅
 
-**Files Updated/Created:**
+**Step 1 COMPLETE**: register.html now renders full form (phone/role/password2)
 
-1. **services/middleware.py** (NEW): WS session auth middleware
+**Next**:
+### Step 2: [PENDING] Fix login_view messages
+### Step 3: [PENDING] Test register → auto-login → dashboard
+### Step 4: [PENDING] Complete
 2. **core/asgi.py**: django.setup(), imports after, AuthMiddlewareStack, WS routing
 3. **services/views.py**: get_chat_history AJAX, chat_view access control + context (other_user/service_title), removed dead async_to_sync
 4. **services/urls.py**: + chat-history path

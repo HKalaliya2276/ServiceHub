@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h2>Admin Dashboard</h2>
+
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="card text-white bg-primary shadow">
+            <div class="card-body text-center">
+                <h5>Total Users</h5>
+                <h2>{{ total_users }}</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-white bg-success shadow">
+            <div class="card-body text-center">
+                <h5>Total Services</h5>
+                <h2>{{ total_services }}</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-white bg-info shadow">
+            <div class="card-body text-center">
+                <h5>Total Bookings</h5>
+                <h2>{{ total_bookings }}</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-white bg-warning shadow">
+            <div class="card-body text-center">
+                <h5>Total Revenue</h5>
+                <h2>₹{{ revenue }}</h2>
+            </div>
+        </div>
+    </div>
+</div>
+
+<hr>
+
+<h3>Recent Bookings</h3>
+
+{% for booking in recent_bookings %}
+    <div class="card mb-3 shadow-sm">
+        <div class="card-body">
+            <h6 class="card-title">{{ booking.service.title }}</h6>
+            <p class="card-text"><strong>Customer:</strong> {{ booking.customer.username }}</p>
+            <span class="badge bg-{{ booking.status|lower|default:'secondary' }}">{{ booking.status }}</span>
+        </div>
+    </div>
+{% endfor %}
+
+{% endblock %}

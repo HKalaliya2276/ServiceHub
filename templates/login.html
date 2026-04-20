@@ -16,6 +16,12 @@
 
                 <input type="password" name="password" class="form-control mb-3" placeholder="Password">
 
+                {% if messages %}
+                    {% for message in messages %}
+                        <div class="alert alert-danger">{{ message }}</div>
+                    {% endfor %}
+                {% endif %}
+
                 <button class="btn btn-primary w-100">Login</button>
             </form>
 

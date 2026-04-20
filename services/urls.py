@@ -20,4 +20,5 @@ urlpatterns = [
     path('mark-read/<int:notif_id>/', views.mark_single_read, name='mark_single_read'),
     path('chat/<int:booking_id>/', views.chat_view, name='chat'),
     path('chat-history/<int:booking_id>/', views.get_chat_history, name='chat_history'),
+    path('admin-dashboard/', views.admin_dashboard, name='admin_dashboard'),
 ]

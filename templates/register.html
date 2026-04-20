@@ -11,13 +11,37 @@
 
             <form method="POST">
                 {% csrf_token %}
-
-                <input type="text" name="username" class="form-control mb-2" placeholder="Username">
-
-                <input type="email" name="email" class="form-control mb-2" placeholder="Email">
-
-                <input type="password" name="password" class="form-control mb-2" placeholder="Password">
-
+{{ form.non_field_errors }}
+                <div class="mb-3">
+                    <label class="form-label">{{ form.username.label }}</label>
+                    {{ form.username }}
+                    {% if form.username.errors %}<div class="text-danger">{{ form.username.errors }}</div>{% endif %}
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">{{ form.email.label }}</label>
+                    {{ form.email }}
+                    {% if form.email.errors %}<div class="text-danger">{{ form.email.errors }}</div>{% endif %}
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">{{ form.phone.label }}</label>
+                    {{ form.phone }}
+                    {% if form.phone.errors %}<div class="text-danger">{{ form.phone.errors }}</div>{% endif %}
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">{{ form.role.label }}</label>
+                    {{ form.role }}
+                    {% if form.role.errors %}<div class="text-danger">{{ form.role.errors }}</div>{% endif %}
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">{{ form.password1.label }}</label>
+                    {{ form.password1 }}
+                    {% if form.password1.errors %}<div class="text-danger">{{ form.password1.errors }}</div>{% endif %}
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">{{ form.password2.label }}</label>
+                    {{ form.password2 }}
+                    {% if form.password2.errors %}<div class="text-danger">{{ form.password2.errors }}</div>{% endif %}
+                
                 <button class="btn btn-success w-100">Register</button>
             </form>
 

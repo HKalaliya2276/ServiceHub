@@ -14,7 +14,7 @@ def register_view(request):
         if form.is_valid():
             user = form.save()
             login(request, user)
-            return redirect('login')
+            return redirect('dashboard')
     else:
         form = UserRegisterForm()
     return render(request, 'register.html', {'form': form})
@@ -30,6 +30,9 @@ def login_view(request):
         if user is not None:
             login(request, user)
             return redirect('dashboard') 
+        else:
+            from django.contrib import messages
+            messages.error(request, 'Invalid username or password.')
     return render(request, 'login.html')
 
 
@@ -42,7 +45,10 @@ def logout_view(request):
 def dashboard_redirect(request):
     user = request.user
 
-    if user.role == 'customer':
+    if user.role == 'admin':
+        return redirect('admin_dashboard')
+    
+    elif user.role == 'customer':
         return redirect('customer_dashboard')
 
     elif user.role == 'vendor':

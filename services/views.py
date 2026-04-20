@@ -10,6 +10,7 @@ from django.http import JsonResponse, HttpResponseForbidden
 from asgiref.sync import async_to_sync
 from channels.layers import get_channel_layer
 from .models import Booking, Notification, Service, ChatMessage
+from django.db.models import Sum
 
 User = get_user_model()
 
@@ -329,3 +330,30 @@ def chat_view(request, booking_id):
         'service_title': booking.service.title
     }
     return render(request, 'chat.html', context)
+
+
+@login_required
+def admin_dashboard(request):
+    if request.user.role != 'admin':
+        return redirect('dashboard')
+
+    total_users = User.objects.count()
+    total_services = Service.objects.count()
+    total_bookings = Booking.objects.count()
+
+    # Revenue = only paid bookings
+    revenue = Booking.objects.filter(payment_status='paid').aggregate(
+        total=Sum('service__price')
+    )['total'] or 0
+
+    recent_bookings = Booking.objects.select_related('service', 'customer').order_by('-created_at')[:5]
+
+    context = {
+        'total_users': total_users,
+        'total_services': total_services,
+        'total_bookings': total_bookings,
+        'revenue': revenue,
+        'recent_bookings': recent_bookings
+    }
+
+    return render(request, 'admin_dashboard.html', context)
