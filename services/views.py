@@ -371,6 +371,22 @@ def admin_dashboard(request):
         .order_by('month')[:12]
     )
 
+    # 🔥 Top Vendors
+    top_vendors = (
+        Booking.objects
+        .values('service__vendor__username')
+        .annotate(total=Count('id'))
+        .order_by('-total')[:5]
+    )
+
+    # 🔥 Top Services
+    top_services = (
+        Booking.objects
+        .values('service__title')
+        .annotate(total=Count('id'))
+        .order_by('-total')[:5]
+    )
+
     context = {
         'total_users': total_users,
         'total_services': total_services,
@@ -380,6 +396,8 @@ def admin_dashboard(request):
         'months': [str(x['month'].strftime("%b %Y")) for x in monthly_bookings],
         'booking_counts': [x['count'] for x in monthly_bookings],
         'revenue_data': [float(x['total'] or 0) for x in monthly_revenue],
+        'top_vendors': top_vendors,
+        'top_services': top_services,
     }
 
     return render(request, 'admin_dashboard.html', context)

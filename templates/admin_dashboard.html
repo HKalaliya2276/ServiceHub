@@ -82,6 +82,47 @@
 
 <hr>
 
+<h3 class="mb-3">Top Performers</h3>
+
+<div class="row">
+
+    <!-- 🏆 Top Vendors -->
+    <div class="col-md-6">
+        <div class="card shadow p-3">
+            <h5>🏆 Top Vendors</h5>
+
+            {% for v in top_vendors %}
+                <div class="d-flex justify-content-between border-bottom py-2">
+                    <span>{{ v.service__vendor__username }}</span>
+                    <span class="badge bg-success">{{ v.total }}</span>
+                </div>
+            {% empty %}
+                <p>No data</p>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- 🔥 Top Services -->
+    <div class="col-md-6">
+        <div class="card shadow p-3">
+            <h5>🔥 Top Services</h5>
+
+            {% for s in top_services %}
+                <div class="d-flex justify-content-between border-bottom py-2">
+                    <span>{{ s.service__title }}</span>
+                    <span class="badge bg-primary">{{ s.total }}</span>
+                </div>
+            {% empty %}
+                <p>No data</p>
+            {% endfor %}
+        </div>
+    </div>
+
+</div>
+
+
+<hr>
+
 <!-- 📋 RECENT BOOKINGS -->
 <h3>Recent Bookings</h3>
 
