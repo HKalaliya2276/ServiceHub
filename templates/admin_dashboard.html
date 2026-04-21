@@ -54,21 +54,30 @@
 <h3 class="mb-3">Analytics</h3>
 
 <div class="row mb-5">
-
     <div class="col-md-6">
-        <div class="card shadow p-3">
-            <h6 class="text-center">Monthly Bookings</h6>
-            <canvas id="bookingChart"></canvas>
+        <div class="card shadow">
+            <div class="card-header">
+                <h6>Monthly Bookings</h6>
+            </div>
+            <div class="card-body p-3">
+                <div style="height: 350px;">
+                    <canvas id="bookingChart"></canvas>
+                </div>
+            </div>
         </div>
     </div>
-
     <div class="col-md-6">
-        <div class="card shadow p-3">
-            <h6 class="text-center">Monthly Revenue</h6>
-            <canvas id="revenueChart"></canvas>
+        <div class="card shadow">
+            <div class="card-header">
+                <h6>Monthly Revenue</h6>
+            </div>
+            <div class="card-body p-3">
+                <div style="height: 350px;">
+                    <canvas id="revenueChart"></canvas>
+                </div>
+            </div>
         </div>
     </div>
-
 </div>
 
 <hr>
@@ -95,45 +104,63 @@
 
 <!-- 📊 CHART SCRIPT -->
 <script>
-const months = {{ months|safe }};
-const bookings = {{ booking_counts|safe }};
-const revenue = {{ revenue_data|safe }};
+// Chart data
+const chartData = {
+  months: {{ months|safe }},
+  bookings: {{ booking_counts|safe }},
+  revenue: {{ revenue_data|safe }}
+};
 
 // 📊 Booking Chart
-new Chart(document.getElementById('bookingChart'), {
+const bookingCtx = document.getElementById('bookingChart').getContext('2d');
+new Chart(bookingCtx, {
     type: 'bar',
     data: {
-        labels: months,
+        labels: chartData.months,
         datasets: [{
             label: 'Bookings',
-            data: bookings,
+            data: chartData.bookings,
+            backgroundColor: 'rgba(54, 162, 235, 0.6)',
+            borderColor: 'rgba(54, 162, 235, 1)',
             borderWidth: 1
         }]
     },
     options: {
         responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+            y: { beginAtZero: true }
+        },
         plugins: {
-            legend: { display: true }
+            legend: { display: false }
         }
     }
 });
 
 // 💰 Revenue Chart
-new Chart(document.getElementById('revenueChart'), {
+const revenueCtx = document.getElementById('revenueChart').getContext('2d');
+new Chart(revenueCtx, {
     type: 'line',
     data: {
-        labels: months,
+        labels: chartData.months,
         datasets: [{
-            label: 'Revenue',
-            data: revenue,
-            borderWidth: 2,
-            tension: 0.3
+            label: 'Revenue (₹)',
+            data: chartData.revenue,
+            borderColor: 'rgba(255, 159, 64, 1)',
+            backgroundColor: 'rgba(255, 159, 64, 0.2)',
+            borderWidth: 3,
+            fill: true,
+            tension: 0.4
         }]
     },
     options: {
         responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+            y: { beginAtZero: true }
+        },
         plugins: {
-            legend: { display: true }
+            legend: { display: false }
         }
     }
 });

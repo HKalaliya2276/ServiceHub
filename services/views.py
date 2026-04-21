@@ -349,22 +349,26 @@ def admin_dashboard(request):
 
     recent_bookings = Booking.objects.select_related('service', 'customer').order_by('-created_at')[:5]
 
-    # Monthly bookings
+# Monthly bookings (last 12 months only)
+    from datetime import timedelta
+    from django.utils import timezone
+    one_year_ago = timezone.now() - timedelta(days=365)
+    
     monthly_bookings = (
-        Booking.objects
+        Booking.objects.filter(created_at__gte=one_year_ago)
         .annotate(month=TruncMonth('created_at'))
         .values('month')
         .annotate(count=Count('id'))
-        .order_by('month')
+        .order_by('month')[:12]
     )
 
-    # Monthly revenue
+    # Monthly revenue (last 12 months only)
     monthly_revenue = (
-        Booking.objects.filter(payment_status='paid')
+        Booking.objects.filter(payment_status='paid', created_at__gte=one_year_ago)
         .annotate(month=TruncMonth('created_at'))
         .values('month')
         .annotate(total=Sum('service__price'))
-        .order_by('month')
+        .order_by('month')[:12]
     )
 
     context = {
@@ -373,10 +377,9 @@ def admin_dashboard(request):
         'total_bookings': total_bookings,
         'revenue': revenue,
         'recent_bookings': recent_bookings,
-        'months': [str(x['month'].strftime("%b")) for x in monthly_bookings],
+        'months': [str(x['month'].strftime("%b %Y")) for x in monthly_bookings],
         'booking_counts': [x['count'] for x in monthly_bookings],
-
-        'revenue_data': [x['total'] or 0 for x in monthly_revenue],
+        'revenue_data': [float(x['total'] or 0) for x in monthly_revenue],
     }
 
     return render(request, 'admin_dashboard.html', context)
