@@ -374,7 +374,7 @@ def admin_dashboard(request):
     # 🔥 Top Vendors
     top_vendors = (
         Booking.objects
-        .values('service__vendor__username')
+        .values('service__vendor__id', 'service__vendor__username')
         .annotate(total=Count('id'))
         .order_by('-total')[:5]
     )
@@ -382,7 +382,7 @@ def admin_dashboard(request):
     # 🔥 Top Services
     top_services = (
         Booking.objects
-        .values('service__title')
+        .values('service__id', 'service__title')
         .annotate(total=Count('id'))
         .order_by('-total')[:5]
     )
@@ -401,3 +401,21 @@ def admin_dashboard(request):
     }
 
     return render(request, 'admin_dashboard.html', context)
+
+
+@login_required
+def vendor_detail(request, vendor_id):
+    vendor = User.objects.get(id=vendor_id)
+
+    return render(request, 'vendor_detail.html', {
+        'vendor': vendor
+    })
+
+
+@login_required
+def service_detail(request, service_id):
+    service = Service.objects.get(id=service_id)
+
+    return render(request, 'service_detail.html', {
+        'service': service
+    })

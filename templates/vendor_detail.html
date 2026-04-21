@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<h2>Vendor Detail</h2>
+
+<div class="card p-4 shadow">
+
+    <h4>{{ vendor.username }}</h4>
+
+    <p><strong>Email:</strong> {{ vendor.email }}</p>
+
+    <p><strong>Role:</strong> {{ vendor.role }}</p>
+
+    <p><strong>ID:</strong> {{ vendor.id }}</p>
+
+</div>
+
+{% endblock %}

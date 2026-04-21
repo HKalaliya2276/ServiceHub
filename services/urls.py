@@ -21,4 +21,6 @@ urlpatterns = [
     path('chat/<int:booking_id>/', views.chat_view, name='chat'),
     path('chat-history/<int:booking_id>/', views.get_chat_history, name='chat_history'),
     path('admin-dashboard/', views.admin_dashboard, name='admin_dashboard'),
+    path('vendor/<int:vendor_id>/', views.vendor_detail, name='vendor_detail'),
+    path('service/<int:service_id>/', views.service_detail, name='service_detail'),
 ]

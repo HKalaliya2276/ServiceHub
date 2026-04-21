@@ -93,9 +93,11 @@
 
             {% for v in top_vendors %}
                 <div class="d-flex justify-content-between border-bottom py-2">
-                    <span>{{ v.service__vendor__username }}</span>
-                    <span class="badge bg-success">{{ v.total }}</span>
-                </div>
+        <a href="{% url 'vendor_detail' v.service__vendor__id %}">
+            {{ v.service__vendor__username }}
+        </a>
+        <span class="badge bg-success">{{ v.total }}</span>
+    </div>
             {% empty %}
                 <p>No data</p>
             {% endfor %}
@@ -109,9 +111,11 @@
 
             {% for s in top_services %}
                 <div class="d-flex justify-content-between border-bottom py-2">
-                    <span>{{ s.service__title }}</span>
-                    <span class="badge bg-primary">{{ s.total }}</span>
-                </div>
+        <a href="{% url 'service_detail' s.service__id %}">
+            {{ s.service__title }}
+        </a>
+        <span class="badge bg-primary">{{ s.total }}</span>
+    </div>
             {% empty %}
                 <p>No data</p>
             {% endfor %}
